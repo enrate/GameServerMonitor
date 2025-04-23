@@ -70,6 +70,7 @@ async def on_ready():
 
     if not tasks_query_servers.is_running():
         tasks_query_servers.start()
+        update_status.start()
 
     if not cache_guilds.is_running() and env('WEB_API_ENABLE'):
         cache_guilds.start()
@@ -225,10 +226,6 @@ async def update_status():
         )
     except Exception as e:
         print(f"Ошибка обновления статуса: {e}")
-
-@bot.event
-async def on_ready():
-    update_status.start()
   
 async def send_alert(server: Server, alert: Alert):
     """Send alert to webhook"""
