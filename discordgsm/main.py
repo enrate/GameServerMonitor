@@ -207,7 +207,29 @@ def alert_embed(server: Server, alert: Alert):
 
     return embed
 
+# В начале основной функции (после инициализации бота)
+@tasks.loop(minutes=2)
+async def update_status():
+    try:
+        # Получите данные о сервере (пример для первого сервера из списка)
+        server = bot.servers[0]
+        players = server.result['players']
+        max_players = server.result['max_players']
+        
+        # Установите статус
+        await bot.change_presence(
+            activity=discord.Activity(
+                type=discord.ActivityType.watching,
+                name=f"{players}/{max_players} игроков"
+            )
+        )
+    except Exception as e:
+        print(f"Ошибка обновления статуса: {e}")
 
+@bot.event
+async def on_ready():
+    update_status.start()
+  
 async def send_alert(server: Server, alert: Alert):
     """Send alert to webhook"""
     if webhook_url := server.style_data.get('_alert_webhook_url'):
